@@ -1,17 +1,18 @@
 
 
+
 #include <inttypes.h>
 #include <Wire.h>
 #include <Arduino.h>
 #include <SHT2x.h>
 #include <Ethernet.h>
 #include <SPI.h>
-#include "testlib.h"
+#include <librarytrial.h>
 
 
 
 
- void testlib::setup_system()
+ void librarytrial::setup_system()
 {
   IPAddress ip(192,168,1,129); 
   EthernetClient client; 
@@ -19,48 +20,55 @@
 
   byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //Setting MAC Address
 
+  Wire.begin();
+  Serial.begin(9600);
 
-
+  Serial.println ("Serial confirmed");
   
   if (Ethernet.begin(mac) == 0) 
   {
-    
-}
+    Serial.println("Failed to configure Ethernet using DHCP");
+    Serial.print("mac failed");}
   else 
   {
     Ethernet.begin(mac, ip);
-  
+    Serial.println("Connetced");
+    Serial.print("device is at ");
+    Serial.println(Ethernet.localIP());
     server.begin();
-    
+    Serial.print("server is at ");
+    Serial.println(Ethernet.localIP());
   }
  // delay(1000);
 }
 
 
-void testlib::looping_system()
+void librarytrial::looping_system()
 {
-  
   float humidityData;
-  float temperatureData;  
-
+  float temperatureData;
+  
   IPAddress ip(192,168,1,129); 
   EthernetServer server(80); 
   EthernetClient client = server.available();
   
   
+Serial.println(client);
  
   humidityData=(SHT2x.GetHumidity());
-  
+  Serial.print("Humidity(%RH) from sensor: ");
+  Serial.println (humidityData);
  
   temperatureData=(SHT2x.GetTemperature());
-  
+  Serial.print("Temperature(C) from sensor: ");
+  Serial.println (temperatureData);
 
 
 
    // listen for incoming clients
   
   if (client) {
-    
+    Serial.println("new client");
     // an http request ends with a blank line
     boolean currentLineIsBlank = true;
     while (client.connected()) {
@@ -104,8 +112,9 @@ void testlib::looping_system()
     delay(1);
     // close the connection:
     client.stop();
-   
+    Serial.println("client disconnected");
   }
 }
+
 
 
